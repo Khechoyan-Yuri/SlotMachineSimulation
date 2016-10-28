@@ -1,0 +1,14 @@
+Start:
+Welcome to the World's Greatest Slot Machine!
+You inserted $400.00. You currently have $400.00, you can bet in multiples of $10.
+If you enter 1, you will bet $10. 
+If you enter 2, you will bet $20, etc. 
+Please enter how much you want to bet this time: 
+Betting Amount: $300.00. Fruit chosen: Peach 
+Result:  Melon Melon Melon
+
+None of the randomly selected words matched yours.You won $0.00
+
+New available amount: $100.00
+Net loss if user quits: $300.00.  Do you want to continue playing (y/Y) or quit (n/N): User Choice: n .
+Hasta la vista, baby!

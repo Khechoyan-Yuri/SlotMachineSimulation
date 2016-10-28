@@ -1,0 +1,2 @@
+INDEX VERSION 1.129+J:\CIS\CIS 210 - Java\HWs\HW 4 - SlotMachineSimulation\.metadata\.plugins\org.eclipse.jdt.core
+599894317.index

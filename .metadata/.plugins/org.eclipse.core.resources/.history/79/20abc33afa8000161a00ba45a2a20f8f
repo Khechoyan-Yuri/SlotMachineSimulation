@@ -1,0 +1,321 @@
+/* ========================================================================== */
+/*	PROGRAM Slot Machine Simulation
+
+    AUTHOR: Yuri Khechoyan & Jessie Wilkins
+    COURSE NUMBER: CIS 210
+    COURSE SECTION NUMBER: 01
+    INSTRUCTOR NAME: Dr. Tian
+    PROJECT NUMBER: 4
+    DUE DATE: 9/15/2016
+
+SUMMARY
+
+	This program is used to simulate 
+	a Casino Slot Machine 
+	User will be asked to enter the amount of money
+	that they want to bet on the slots.
+	Once wager has been confirmed, user will be 
+	asked to place their wager on a certain fruit.
+	If the fruit selected appears 1x,
+	they will get a the same amount back as they wagered.
+	If two user selected fruits appear, they win 2x their wager.
+	If all three fruits match with their selection, they win
+	3x their waged amount (JackPot - amount wagered)
+	
+	If none of the three fruit match with their selection,
+	user loses the amount they have wagered.
+	
+	A Random Number Generator will choose between 6 fruits (3 Winning Fruit):
+	1. Cherry 
+	2. Orange 
+	3. Apple 
+	4. Peach 
+	5. Melon 
+	6. Pear
+
+INPUT
+
+The input for this program will be Doubles (amount wagered), 
+Doubles will refer to the US Dollar (USD)
+And a file containing all of their money 
+will be imported as well (similar to a wallet).
+
+OUTPUT
+
+The input values are echoprinted at the end. 
+Program will output the 3 winning fruits (along with the selected fruit)
+The 3 winning fruits will be drawn at random.
+And also the accompanied winnings or loss of cash.
+
+ASSUMPTIONS
+- None
+
+*/
+
+/* MAIN FUNCTION */
+
+import java.io.*;							//Import for input/output data streams/file system
+import java.util.Scanner;					//Import Scanner Object	
+import java.util.Random;					//Import Random number Generator Object
+
+public class SlotMachineSimulator {
+	public static void main(String[] args) throws IOException{
+		
+		//Variables and Constants
+		char repeatGameValue = 'y';//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the sentinel value that is initiated to 'y' - used to "Play again" or not
+		String availableMoneyWord;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the string that is used to read in the available amount from the file
+		double startingAmount;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the double that is assigned the amount that the program starts with
+		double availableAmount;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable used to record the amount that is currently available to bet
+		double bettingAmount;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable used to record amount the user will bet
+		double amountWon;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable used to record the amount won from the slot machine
+		double netLoss;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable used to record the net loss
+		double netGain;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable used to record the net gain
+		int matchCount = 0;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is the variable that keeps track of the number of matches that occur
+		int randNum;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//This is assigned the random number that is generated
+		final String[] FRUIT_SELECTION = {"Cherry", "Orange", "Apple", "Peach", "Melon", "Pear"};	//Names of possible selection & winning fruits
+		final int[] FRUIT_NUMBERS = {1, 2, 3, 4, 5, 6};//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//Number of randomly generated fruit
+		final double MINIMAL_AMOUNT = 10;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//$10 is the bare minimum needed in order to play
+		final int SMALLEST_IMAGE_OPTION = 1;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//Minimum number assigned to Fruit array
+		final int BIGGEST_IMAGE_OPTION = 6;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//Maximum number assigned to Fruit array
+		int userFruit;//>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	>>	//User Selected Fruit
+
+		
+		//Create input file object for storing - then receive input file to store inside input object
+		File moneyFile = new File("InputFile.txt");
+		Scanner availableMoney = new Scanner(moneyFile);
+		
+		//2nd Scanner for User picked Fruit
+		Scanner userFruitPick = new Scanner(System.in);
+		
+		//3rd Scanner for amount the user wants to bet
+		Scanner userBettingAmount = new Scanner(System.in);
+		
+		//4th Scanner for the sentinel value _ decision to "play again"
+		Scanner charDecision = new Scanner(System.in);
+		
+		//Used to input info into String from input file
+		availableMoneyWord = availableMoney.nextLine();
+		
+		//This converts the string to a double
+		availableAmount = Double.parseDouble(availableMoneyWord);
+		
+		//This initiates the starting amount variable as the current amount before the program starts
+		startingAmount = availableAmount;
+		
+		//Creates Random Number Generator Object - selecting Winning Fruits
+		Random fruitGenerator = new Random(); 
+		
+		//This deletes the contents of the previous file
+		PrintWriter deleteContents = new PrintWriter("output.txt");
+		
+		//Overwrites output text
+		deleteContents.println("Start:");
+		
+		//Closing PrintWriter object
+		deleteContents.close();
+		
+		//This indicates that the output file should be appended to
+		FileWriter appendVar = new FileWriter("output.txt", true);
+		
+		//This creates an object that writes to the given file
+		PrintWriter outputFile = new PrintWriter(appendVar);
+	    
+		
+		//*********************************
+		//			START OF PROGRAM	  *
+		//*********************************
+		
+		
+		while(repeatGameValue != 'n' && repeatGameValue != 'N' && availableAmount > 0) {
+			//This is the series of commands that give the user the instructions and prints it out to the 
+			//the console and file
+			System.out.println("Welcome to the World's Greatest Slot Machine!");
+			outputFile.println("Welcome to the World's Greatest Slot Machine!");
+			//This prints out the amount of money that was inserted on the console and file
+			System.out.printf("You inserted $%.2f\n", startingAmount);
+			outputFile.printf("You inserted $%.2f. ", startingAmount);
+			//This prints out the currently available amount and how one can bet to the console and file
+			System.out.printf("You currently have $%.2f, you can bet in multiples of $10\n", availableAmount);
+			outputFile.printf("You currently have $%.2f, you can bet in multiples of $10.\r\n", availableAmount);
+			//This prints out an example of how to enter in betting amounts to the console and the file
+			System.out.println("If you enter 1, you will bet $10");
+			outputFile.println("If you enter 1, you will bet $10. ");
+			System.out.println("If you enter 2, you will bet $20, etc.");
+			outputFile.println("If you enter 2, you will bet $20, etc. ");
+			System.out.printf("Please enter how much you want to bet this time: ");
+			outputFile.println("Please enter how much you want to bet this time: ");
+			
+			//Program waits for user input of Dollar amount to bet
+			bettingAmount = userBettingAmount.nextDouble();
+			//This checks if the user entered an amount that is less than 1
+			//and that is greater than availableAmount and asks the user to enter another value
+			while(bettingAmount <1 || bettingAmount*10 > availableAmount) {
+				//This prints out the given error if the betting amount is less than 1
+				if(bettingAmount <1) {
+					System.out.println("This is less than 10. Please enter a number that is 1 or greater.\n");
+					outputFile.println("This is less than 10. Please enter a number that is 1 or greater.\n");
+				}//This ends the if statement
+				//This prints out the given error if the betting amount is greater than the available amount
+				else if(bettingAmount*10 > availableAmount) {
+					System.out.println("This is greater than the availabe amount. Please enter a number that is greater than the available amount.\n");
+					outputFile.println("This is greater than the availabe amount. Please enter a number that is greater than the available amount.\n");
+				}//This ends the else if statement
+				bettingAmount = userBettingAmount.nextDouble();
+			}//Closes while loop (bettingAmount)
+			
+			//This assigns the bettingAmount to be 10X itself
+			bettingAmount*=MINIMAL_AMOUNT;
+			
+			
+			//This prints out the bet amount to the output file and the console
+			outputFile.printf("Betting Amount: $%.2f. ", bettingAmount);
+			System.out.printf("Betting Amount: $%.2f.\n", bettingAmount);
+			
+			//Ask for what Fruit User wants to wage on
+			System.out.println("1. Cherry | 2. Orange | 3. Apple | 4. Peach | 5. Melon | 6. Pear");
+			System.out.println("Please enter the number associated with which fruit you want to choose: ");
+			
+			//Store user input into - userFruit
+			userFruit = userFruitPick.nextInt();
+			
+			//This checks if the integer entered is between 1 and 6
+			while(userFruit < SMALLEST_IMAGE_OPTION || userFruit >BIGGEST_IMAGE_OPTION) {
+					System.out.println("The number you have entered does not exist.");
+					System.out.println("Please try again: ");
+					outputFile.println("The number you have entered does not exist.");
+					outputFile.println("Please try again: ");
+					//Store user input into - userFruit
+					userFruit = userFruitPick.nextInt();
+			}//Closes while loop (userFruit)
+			
+			//This prints out the word that was selected by the user to the file
+			outputFile.println("Fruit chosen: " +FRUIT_SELECTION[userFruit-1]+" ");
+				
+			//This prints out the word that was selected by the user to the console	
+			System.out.println("Fruit chosen: " +FRUIT_SELECTION[userFruit-1]+" ");
+			
+			//This prints out the start of the slot machine to the output file & console
+			System.out.print("Result: ");
+			outputFile.print("Result: ");
+				
+			//beginning of for loop
+			for(int i=0; i<3; i++) {
+				//This assigns to the variable a randomly generated number
+				randNum = fruitGenerator.nextInt(6);
+				//This increases the number of matching fruits if the random number is = to the user number
+				if(FRUIT_NUMBERS[randNum] == userFruit) {
+					matchCount+=1;
+				}
+				//This prints out the randomly generated fruit to the console and the output file
+				System.out.print(" "+FRUIT_SELECTION[randNum]);
+				outputFile.print(" "+FRUIT_SELECTION[randNum]);
+			}//end of for loop
+			
+			//This prints a period and a space to the output file
+			outputFile.print("\r\n");
+			
+			//This assigns the match count times the betting amount to the variable
+			amountWon = matchCount*bettingAmount;
+			
+			//This begins the switch statement
+			switch(matchCount) {
+				//This prints out the number of words matched the user given word and the
+				//amount of money won
+				case 1:
+					System.out.print("\nOne of the randomly selected words matched yours.");
+					System.out.printf("You won $%.2f\n", amountWon);
+					outputFile.print("\nOne of the randomly selected words matched yours.");
+					outputFile.printf("You won $%.2f\n", amountWon);
+					break;
+				//This prints out the number of words matched the user given word and the
+				//amount of money won. It also adds the winnings to the available amount
+				case 2:
+					System.out.print("\nTwo of the randomly selected words matched yours.");
+					System.out.printf("You won $%.2f\n", amountWon);
+					outputFile.print("\nTwo of the randomly selected words matched yours.");
+					outputFile.printf("You won $%.2f\n", amountWon);
+					availableAmount+=amountWon;
+					break;
+				//This prints out the number of words matched the user given word and the
+				//amount of money won. It also add the winnings to the available amount.
+				case 3:
+					System.out.print("\nAll three of the randomly selected words matched yours.");
+					System.out.printf("You won $%.2f\n", amountWon);
+					outputFile.print("\nAll three of the randomly selected words matched yours.");
+					outputFile.printf("You won $%.2f\n", amountWon);
+					availableAmount+=amountWon;
+					break;
+				//This prints out the number of words matched the user given word and the
+				//amount of money won.
+				default:
+					System.out.print("\nNone of the randomly selected words matched yours.");
+					System.out.printf("You won $%.2f\n", amountWon);
+					outputFile.print("\nNone of the randomly selected words matched yours.");
+					outputFile.printf("You won $%.2f\n", amountWon);
+					availableAmount-=bettingAmount;
+					break;
+			}//ends the switch statement (matchCount)
+			
+			//This prints out the new available amount
+			outputFile.printf("\r\nNew available amount: $%.2f\r\n", availableAmount);
+			
+			//This sets the net gain as the available amount - the startingAmount and outputs the net gain
+			//if the starting amount - the available amount is less than or equal to 0
+			if(startingAmount - availableAmount <= 0) {
+				netGain = availableAmount - startingAmount;
+				//This outputs to the file the amount won
+				outputFile.printf("Net gain if user quits: $%.2f. ", netGain);
+			}//end if statement
+			
+			//This sets the net loss as the starting amount - available amount and outputs the net loss
+			//if the starting amount - the available amount is greater than or equal to 0
+			else if(startingAmount - availableAmount >= 0) {
+				netLoss = startingAmount - availableAmount;
+				//This outputs to the file the amount lost
+				outputFile.printf("Net loss if user quits: $%.2f. ", netLoss);
+			}//end else if statement
+			
+			//This asks the user if he or she wants to play again
+			System.out.print("Do you want to continue playing (y/Y) or quit (n/N): ");
+			outputFile.print(" Do you want to continue playing (y/Y) or quit (n/N): ");
+			//This accepts the input of the user of y/Y or n/n (yes or no)
+			repeatGameValue = charDecision.nextLine().trim().charAt(0);
+			//This states that the characters are invalid and asks the user to enter another character
+			//while the character does not equal y/Y and n/N
+			while(repeatGameValue != 'y' && repeatGameValue !='Y' && repeatGameValue !='n' && repeatGameValue !='N') {
+				System.out.println("Invalid character. Please enter y/y or n/N: ");
+				repeatGameValue = charDecision.nextLine().trim().charAt(0);
+				outputFile.println("Invalid character. Please enter y/y or n/N:\r\n");
+			}//end while statement
+			
+			//This outputs to the file the user's choice
+			outputFile.print("User Choice: " + repeatGameValue+" ."+"\r\n");
+			//This resets the count of fruit matches to 0
+			matchCount = 0;
+			
+		}//This ends the while statement (repeatGameValue)
+		
+		//Closes Scanner Objects and files
+		userFruitPick.close();			//closes the user input for the chosen fruit
+		
+		availableMoney.close();			//closes the input for the available amount
+		
+		userBettingAmount.close();		//closes the input for the user given amount to bet
+		
+		charDecision.close();			//closes the input for the sentinel value
+		
+		//This prints out the message that one is out of money if the amount if the available amount is 0
+		if(availableAmount == 0) {
+			System.out.println("Sorry, you are out of money.\n");
+			outputFile.println("Sorry, you are out of money.\r\n");
+		}//closes if statement (availableAmount)
+		
+		//Say goodbye
+		System.out.print("Hasta la vista, baby!");
+		outputFile.println("Hasta la vista, baby!");
+		
+		outputFile.close();				//closes outputFile object
+		
+	}//closes Main
+	
+}//closes SlotMachineSimulator class
